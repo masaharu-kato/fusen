@@ -10,7 +10,11 @@
     "prebuild": "rimraf dist",
     "build": "run-p build:*",
     "build:common": "tsc",
-    "build:esm": "tsc -p tsconfig.esm.json"
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "lint": "run-s lint:*",
+    "lint:eslint": "eslint . --ext .ts,.tsx --fix",
+    "lint:prettier": "prettier --write .",
+    "prepare": "simple-git-hooks"
   },
   "files": [
     "dist"
@@ -20,6 +24,9 @@
   },
   "engines": {
     "node": ">=14"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm test && npm run lint"
   },
   "repository": {
     "type": "git",
@@ -47,6 +54,7 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.6.2",
     "rimraf": "^3.0.2",
+    "simple-git-hooks": "^2.8.0",
     "ts-jest": "^28.0.3",
     "ts-node": "^10.8.0",
     "typescript": "^4.7.2"
