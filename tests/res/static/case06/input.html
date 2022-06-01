@@ -1,0 +1,11 @@
+<h1>Your Profile</h1>
+<dl>
+  <dt>Name</dt>
+  <dd class="profile-name" fus-v="userdata.profile.name"></dd>
+  <dt>Birthday</dt>
+  <dd fus-v="bday" fus-with:bday="userdata.profile.birthday" class="birthday">
+    <fus-v bday.month /> <fus-v bday.date />, <fus-v bday.year />.
+  </dd>
+  <dt>Age</dt>
+  <dd fus-v="userdata.profile.age"></dd>
+</dl>

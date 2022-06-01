@@ -1,0 +1,14 @@
+<h1>Your Profile</h1>
+<dl fus-with:prof="userdata.profile" class="my-profile-data">
+  <dt>Name</dt>
+  <dd class="profile-name" fus-v="prof.name"></dd>
+  <dt>Birthday</dt>
+  <dd
+    fus-v="bday.text"
+    class="birthday"
+    fus-with:bday="prof.birthday"
+    fus:data-birthday="bday.value"
+  ></dd>
+  <dt>Age</dt>
+  <dd fus-v="prof.age" fus:data-age="prof.age"></dd>
+</dl>

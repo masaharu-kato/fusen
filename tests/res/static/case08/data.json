@@ -1,0 +1,17 @@
+{
+  "userdata": {
+    "profile": {
+      "name": "Ken SAITO",
+      "age": 28,
+      "birthday": "1985-7-9"
+    }
+  },
+  "achivement": {
+    "n-items": {
+      "purchased": 25,
+      "sold": 8,
+      "on-sale": 3
+    },
+    "rating": 3.82
+  }
+}

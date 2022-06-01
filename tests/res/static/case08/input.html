@@ -1,0 +1,31 @@
+<h1>Your Profile</h1>
+<dl fus-with:user="userdata">
+  <fus-with prof="user.profile">
+    <dt>Name</dt>
+    <dd class="profile-name" fus-v="prof.name"></dd>
+    <dt>Birthday</dt>
+    <dd
+      fus-v="bday.text"
+      class="birthday"
+      fus-with:bday="prof.birthday"
+      fus:data-birthday="bday.value"
+    ></dd>
+    <dt>Age</dt>
+    <dd fus-v="prof.age" fus:data-age="prof.age"></dd>
+  </fus-with>
+</dl>
+<h1>Your achivements</h1>
+<dl>
+  <fus-with achive="user.achivement">
+    <fus-with n-items="achive.n-items">
+      <dt>Purchased</dt>
+      <dd><fus-v n-items.purchased /> items</dd>
+      <dt>Sold</dt>
+      <dd><fus-v n-items.sold /> items</dd>
+      <dt>On sale</dt>
+      <dd><fus-v n-items.on-sale /> items</dd>
+    </fus-with>
+    <dt>Rating</dt>
+    <dd fus-v="achive.rating"></dd>
+  </fus-with>
+</dl>

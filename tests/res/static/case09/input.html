@@ -1,0 +1,21 @@
+<h1>Your Profile</h1>
+<dl fus-with:user="userdata">
+  <fus-with prof="user.profile">
+    <dt>Name</dt>
+    <dd class="profile-name" fus-v="prof.name"></dd>
+    <dt>Mail</dt>
+    <dd>
+      <div class="profile-mail" fus-v="prof.mail"></div>
+      <div class="message-warning" fus-if-not="prof.f_mail_valid">
+        Your mail address is not authorized. Please check your inbox!
+      </div>
+    </dd>
+    <dt>Phone number</dt>
+    <dd>
+      <fus-if prof.phone>
+        <div class="phone-number"><fus-v prof.phone /></div>
+      </fus-if>
+      <fus-else> Not registered. </fus-else>
+    </dd>
+  </fus-with>
+</dl>

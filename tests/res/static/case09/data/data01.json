@@ -1,0 +1,10 @@
+{
+  "userdata": {
+    "profile": {
+      "name": "Ken SAITO",
+      "phone": "012-3456-7890",
+      "mail": "some@example.com",
+      "f_mail_valid": true
+    }
+  }
+}
