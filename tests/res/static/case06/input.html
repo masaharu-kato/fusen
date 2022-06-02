@@ -4,7 +4,8 @@
   <dd class="profile-name" fus-v="userdata.profile.name"></dd>
   <dt>Birthday</dt>
   <dd fus-v="bday" fus-with:bday="userdata.profile.birthday" class="birthday">
-    <fus-v bday.month /> <fus-v bday.date />, <fus-v bday.year />.
+    <fus-out v="bday.month" /> <fus-out v="bday.date" />,
+    <fus-out v="bday.year" />.
   </dd>
   <dt>Age</dt>
   <dd fus-v="userdata.profile.age"></dd>

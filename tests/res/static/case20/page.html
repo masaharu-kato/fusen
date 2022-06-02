@@ -8,20 +8,21 @@
   </tr>
   <template>
     <tr
-      fus-for:item="items"
+      fus-for-name="item"
+      fus-for-iter="items"
       fus-set="item.is-low-stock = item.stock -lt- 5"
       fus:data-item-id="item.id"
       class="item-row"
       fus-class:out-of-stock:-if-not="item.stock"
       fus-class:low-stock:-if="item.is-low-stock"
     >
-      <td class="item-name" fus-var="item.name"></td>
+      <td class="item-name" fus-v="item.name"></td>
       <td class="item-price">
-        <div class="item-price-v" fus-var="item.price"></div>
+        <div class="item-price-v" fus-v="item.price"></div>
         <div class="sale-label" fus-if="item.is_sale">Sale!</div>
       </td>
       <td class="item-stock">
-        <div class="item-stock-v" fus-var="item.stock"></div>
+        <div class="item-stock-v" fus-v="item.stock"></div>
         <div fus-if="item.is-low-stock" class="low-stock-label">Low stock</div>
       </td>
       <td class="item-operation">

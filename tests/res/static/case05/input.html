@@ -1,6 +1,7 @@
 <h1>Profile</h1>
-<div class="my-name">Hello, my name is <fus-v name />.</div>
+<div class="my-name">Hello, my name is <fus-out v="name" />.</div>
 <div class="my-birthday" fus-with:b="birthday">
-  My birthday is <fus-v b.month /> <fus-v b.date />, <fus-v b.year />.
+  My birthday is <fus-out v="b.month" /> <fus-out v="b.date" />,
+  <fus-out v="b.year" />.
 </div>
-<div class="author">Written by <fus -v name />. Thanks :)</div>
+<div class="author">Written by <fus-out v="name" />. Thanks :)</div>

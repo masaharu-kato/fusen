@@ -4,11 +4,16 @@
   <dd class="profile-name" fus-v="prof.name"></dd>
   <dt>Birthday</dt>
   <dd
-    fus-v="bday.text"
-    class="birthday"
+    fus-v="bday"
     fus-with:bday="prof.birthday"
     fus:data-birthday="bday.value"
-  ></dd>
+    class="birthday"
+  >
+    <fus-with bdayt="bday.text">
+      <fus-out v="bdayt.month" /> <fus-out v="bdayt.date" />,
+      <fus-out v="bdayt.year" />.
+    </fus-with>
+  </dd>
   <dt>Age</dt>
   <dd fus-v="prof.age" fus:data-age="prof.age"></dd>
 </dl>

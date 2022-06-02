@@ -3,7 +3,14 @@
     "profile": {
       "name": "Ken SAITO",
       "age": 28,
-      "birthday": "1985-7-9"
+      "birthday": {
+        "value": "1985-07-09",
+        "text": {
+          "year": 1985,
+          "month": "July",
+          "date": 9
+        }
+      }
     }
   }
 }
