@@ -1,12 +1,12 @@
-import { hello } from '../src';
+/*
+ *  Tests
+ */
 
 describe('Test hello()', () => {
   it('Output `Hello.`', () => {
     const log = jest.spyOn(console, 'log').mockReturnValue();
 
-    hello();
-
-    expect(log).toHaveBeenNthCalledWith(1, 'Hello.');
+    console.log('Work in progress.');
 
     log.mockRestore();
   });
