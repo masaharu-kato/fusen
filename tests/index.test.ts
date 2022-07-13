@@ -2,12 +2,10 @@
  *  Tests
  */
 
-describe('Test hello()', () => {
-  it('Output `Hello.`', () => {
-    const log = jest.spyOn(console, 'log').mockReturnValue();
-
-    console.log('Work in progress.');
-
-    log.mockRestore();
-  });
+test.each([
+  [1, 1, 2],
+  [1, 2, 3],
+  [2, 1, 3],
+])('.add(%i, %i)', (a, b, expected) => {
+  expect(a + b).toBe(expected);
 });

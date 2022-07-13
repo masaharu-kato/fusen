@@ -42,6 +42,6 @@ export class TemplateText {
   }
 
   has_codes(): boolean {
-    return !!this.pos_codes;
+    return Boolean(this.pos_codes.length);
   }
 }

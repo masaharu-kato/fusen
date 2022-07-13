@@ -99,7 +99,7 @@ class FusFor extends FlowNode {
   }
 }
 
-class FusElement extends SingleNode {
+export class FusElement extends SingleNode {
   base_elm: Element;
   tmpl_attrs: { [name: string]: TemplateText };
   child: FusNode | null;
@@ -145,7 +145,7 @@ export function* make_fus_nodes(nodes: Array<Node>): Generator<FusNode> {
     const child = new MultipleNode([...make_fus_nodes([...node.childNodes])]);
     if (node instanceof Element) {
       const elm = node;
-      const tag = elm.tagName;
+      const tag = elm.tagName.toLowerCase();
       //
       if (tag == 'fus-if') {
         const expr = elm.getAttribute('v');
