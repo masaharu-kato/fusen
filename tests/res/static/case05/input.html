@@ -1,7 +1,4 @@
 <h1>Profile</h1>
 <div class="my-name">Hello, my name is <fus-out v="name" />.</div>
-<div class="my-birthday" fus-with:b="birthday">
-  My birthday is <fus-out v="b.month" /> <fus-out v="b.date" />,
-  <fus-out v="b.year" />.
-</div>
+<div class="my-birthday" fus-with="birthday">My birthday is {{.month}} {{.date}}, {{.year}}.</div>
 <div class="author">Written by <fus-out v="name" />. Thanks :)</div>

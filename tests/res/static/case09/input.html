@@ -1,19 +1,17 @@
 <h1>Your Profile</h1>
-<dl fus-with:user="userdata">
-  <fus-with prof="user.profile">
+<dl fus-with="userdata" fus-with-as="user">
+  <fus-with v="user.profile" as="prof">
     <dt>Name</dt>
-    <dd class="profile-name" fus-v="prof.name"></dd>
+    <dd class="profile-name">{{prof.name}}</dd>
     <dt>Mail</dt>
     <dd>
-      <div class="profile-mail" fus-v="prof.mail"></div>
-      <div class="message-warning" fus-if-not="prof.f_mail_valid">
-        Your mail address is not authorized. Please check your inbox!
-      </div>
+      <div class="profile-mail">{{prof.mail}}</div>
+      <div class="message-warning" fus-if-not="prof.f_mail_valid">Your mail address is not authorized. Please check your inbox!</div>
     </dd>
     <dt>Phone number</dt>
     <dd>
-      <fus-if prof.phone>
-        <div class="phone-number"><fus-out v="prof.phone" /></div>
+      <fus-if v="prof.phone">
+        <div class="phone-number">{{prof.phone}}</div>
       </fus-if>
       <fus-else> Not registered. </fus-else>
     </dd>

@@ -8,31 +8,28 @@
   </tr>
   <template>
     <tr
-      fus-for-name="item"
-      fus-for-iter="items"
+      fus-for="items"
+      fus-for-as="item"
       fus-set="item.is-low-stock = item.stock -lt- 5"
-      fus:data-item-id="item.id"
+      data-item-id="{{item.id}}"
       class="item-row"
       fus-class:out-of-stock:-if-not="item.stock"
       fus-class:low-stock:-if="item.is-low-stock"
     >
-      <td class="item-name" fus-v="item.name"></td>
+      <td class="item-name">{{item.name}}</td>
       <td class="item-price">
-        <div class="item-price-v" fus-v="item.price"></div>
+        <div class="item-price-v">{{item.price}}</div>
         <div class="sale-label" fus-if="item.is_sale">Sale!</div>
       </td>
       <td class="item-stock">
-        <div class="item-stock-v" fus-v="item.stock"></div>
+        <div class="item-stock-v">{{item.stock}}</div>
         <div fus-if="item.is-low-stock" class="low-stock-label">Low stock</div>
       </td>
       <td class="item-operation">
         <button class="item-detail-btn">Detail</button>
-        <button class="item-buy-btn" fus:disabled:-if-not="item.stock">
-          Buy
-        </button>
+        <button class="item-buy-btn" fus:disabled:-if-not="item.stock">Buy</button>
       </td>
     </tr>
-
     <tr fus-for-else class="item-no-rows">
       <td colspan="100%">No items found.</td>
     </tr>

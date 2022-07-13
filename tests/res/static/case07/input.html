@@ -1,19 +1,11 @@
 <h1>Your Profile</h1>
 <dl fus-with:prof="userdata.profile" class="my-profile-data">
   <dt>Name</dt>
-  <dd class="profile-name" fus-v="prof.name"></dd>
+  <dd class="profile-name">{{prof.name}}</dd>
   <dt>Birthday</dt>
-  <dd
-    fus-v="bday"
-    fus-with:bday="prof.birthday"
-    fus:data-birthday="bday.value"
-    class="birthday"
-  >
-    <fus-with bdayt="bday.text">
-      <fus-out v="bdayt.month" /> <fus-out v="bdayt.date" />,
-      <fus-out v="bdayt.year" />.
-    </fus-with>
+  <dd fus-with="prof.birthday" data-birthday="{{bday.value}}" class="birthday">
+    <fus-with v=".text" as="bdayt">{{bdayt.month}} {{bdayt.date}}, {{bdayt.year}}.</fus-with>
   </dd>
   <dt>Age</dt>
-  <dd fus-v="prof.age" fus:data-age="prof.age"></dd>
+  <dd data-age="{{prof.age}}">{{prof.age}}</dd>
 </dl>

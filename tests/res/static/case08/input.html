@@ -1,31 +1,26 @@
 <h1>Your Profile</h1>
-<dl fus-with:user="userdata">
-  <fus-with prof="user.profile">
+<dl fus-with="userdata">
+  <fus-with v=".profile" as="prof">
     <dt>Name</dt>
-    <dd class="profile-name" fus-v="prof.name"></dd>
+    <dd class="profile-name">{{.name}}</dd>
     <dt>Birthday</dt>
-    <dd
-      fus-v="bday.text"
-      class="birthday"
-      fus-with:bday="prof.birthday"
-      fus:data-birthday="bday.value"
-    ></dd>
+    <dd fus-with=".birthday" fus-with-as="bday" class="birthday" fus:data-birthday="bday.value">{{bday.text}}</dd>
     <dt>Age</dt>
-    <dd fus-v="prof.age" fus:data-age="prof.age"></dd>
+    <dd data-age="{{.age}}">{{.age}}</dd>
   </fus-with>
 </dl>
 <h1>Your achivements</h1>
 <dl>
-  <fus-with achive="user.achivement">
-    <fus-with n-items="achive.n-items">
+  <fus-with v="user.achivement" as="achive">
+    <fus-with v="achive.n-items" as="n-items">
       <dt>Purchased</dt>
-      <dd><fus-out v="n-items.purchased" /> items</dd>
+      <dd>{{n-items.purchased}} items</dd>
       <dt>Sold</dt>
-      <dd><fus-out v="n-items.sold" /> items</dd>
+      <dd>{{n-items.sold}} items</dd>
       <dt>On sale</dt>
-      <dd><fus-out v="n-items.on-sale" /> items</dd>
+      <dd>{{n-items.on-sale}} items</dd>
     </fus-with>
     <dt>Rating</dt>
-    <dd fus-v="achive.rating"></dd>
+    <dd>{{achive.rating}}</dd>
   </fus-with>
 </dl>
