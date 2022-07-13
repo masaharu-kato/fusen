@@ -144,7 +144,6 @@ class FusElement {
 
   // prettier-ignore
   static TAG_METHODS: {[key: string]: (v :FusElement) => void} = {
-    // comment
     'fus-out'         : (v: FusElement) => v.tag_fus_out,
     'fus-if'          : (v: FusElement) => v.tag_fus_if,
     'fus-else'        : (v: FusElement) => v.tag_fus_else,
@@ -190,12 +189,8 @@ class FusElement {
   //   this.attr_fus_v();
   // }
 
-  attr_or_null(attr_name: string): string | null {
-    return this.#elm.getAttribute(attr_name);
-  }
-
   attr(attr_name: string, _default: string | undefined = undefined): string {
-    const val = this.attr_or_null(attr_name);
+    const val = this.#elm.getAttribute(attr_name);
     if (val === null) {
       if (_default !== undefined) return _default;
       throw new Error('Attribute not set: ' + attr_name);
@@ -203,33 +198,23 @@ class FusElement {
     return val;
   }
 
-  has_attr(attr_name: string): boolean {
-    return this.#elm.hasAttribute(attr_name);
-  }
-
-  getenv(env_name: string): EnvValue {
-    return this.#env.data.get_enval(env_name);
-  }
-
-  getval(env_name: string): EnvValue {
-    return this.#env.data.get_scalar(env_name);
-  }
-
-  env_add(env_name: string, val: EnvValue) {
-    this.#env.data.add(env_name, val);
-  }
-
   process_attrs() {
-    if (this.has_attr('fus-def')) {
+    //  Get all attributes as object {name: value}
+    const attrs = this.#elm.getAttributeNames().reduce((o, name) => {
+      return { ...o, [name]: this.#elm.getAttribute(name) };
+    }, {});
+
+    if (attrs['fus-def']) {
       this.fus_def(this.attr('fus-def'), 'fus-def-arg:');
     }
 
     for (const attr in this.#elm.attributes) {
       const alias = parse_prefix(attr, 'fus-with:');
-      if (alias !== null) this.env_add(alias, this.getenv(this.attr(alias)));
+      if (alias !== null)
+        this.#env.data.add(alias, this.#env.data.get_enval(this.attr(alias)));
     }
 
-    if (this.has_attr('fus-for')) {
+    if (this.#elm.hasAttribute('fus-for')) {
       const prefix = 'fus-for-';
       return this.fus_for({
         iter_name: this.attr(prefix + 'iter'),
@@ -238,23 +223,23 @@ class FusElement {
         i_name: this.attr(prefix + 'iname'),
         i_start: Number(this.attr(prefix + 'i-start', '0')),
         i_step: Number(this.attr(prefix + 'i-step', '1')),
-        to_top: this.has_attr(prefix + 'to-top'),
+        to_top: this.#elm.hasAttribute(prefix + 'to-top'),
       });
     }
 
-    if (this.has_attr('fus-switch')) {
+    if (this.#elm.hasAttribute('fus-switch')) {
       return this.fus_switch(this.attr('fus-switch'));
     }
 
-    if (this.has_attr('fus-case')) {
+    if (this.#elm.hasAttribute('fus-case')) {
       return this.fus_case(this.attr('fus-case'));
     }
 
     const ifopt: FusIfOptions = {
       v_name: this.attr('fus-if'),
       is_null: false,
-      has_eq: this.has_attr('fus-if-eq'),
-      eq: this.attr_or_null('fus-if-eq'),
+      has_eq: this.#elm.hasAttribute('fus-if-eq'),
+      eq: this.#elm.getAttribute('fus-if-eq'),
       gt: Number(this._get_attr_val_or_var('fus-if-gt')),
       ge: Number(this._get_attr_val_or_var('fus-if-ge')),
       lt: Number(this._get_attr_val_or_var('fus-if-lt')),
@@ -263,52 +248,54 @@ class FusElement {
     };
 
     let f_proc = null;
-    if (this.has_attr('fus-for-else')) {
+    if (this.#elm.hasAttribute('fus-for-else')) {
       f_proc = this.fus_for_else();
     }
 
     if (!f_proc) return;
 
-    if (this.has_attr('fus-if')) {
+    if (this.#elm.hasAttribute('fus-if')) {
       f_proc = this.fus_if(ifopt);
       //
-    } else if (this.has_attr('fus-else-if')) {
+    } else if (this.#elm.hasAttribute('fus-else-if')) {
       f_proc = this.fus_else_if(ifopt);
       //
-    } else if (this.has_attr('fus-if-not')) {
+    } else if (this.#elm.hasAttribute('fus-if-not')) {
       ifopt.v_name = this.attr('fus-if-not');
       ifopt.not = true;
       f_proc = this.fus_if(ifopt);
       //
-    } else if (this.has_attr('fus-else-if-not')) {
+    } else if (this.#elm.hasAttribute('fus-else-if-not')) {
       ifopt.v_name = this.attr('fus-else-if-not');
       ifopt.not = true;
       f_proc = this.fus_else_if(ifopt);
       //
-    } else if (this.has_attr('fus-if-is-null')) {
+    } else if (this.#elm.hasAttribute('fus-if-is-null')) {
       ifopt.v_name = this.attr('fus-if-is-null');
       ifopt.is_null = true;
       ifopt.not = true;
       f_proc = this.fus_if(ifopt);
       //
-    } else if (this.has_attr('fus-if-is-not-null')) {
+    } else if (this.#elm.hasAttribute('fus-if-is-not-null')) {
       ifopt.v_name = this.attr('fus-if-is-not-null');
       ifopt.is_null = true;
       ifopt.not = true;
       f_proc = this.fus_if(ifopt);
       //
-    } else if (this.has_attr('fus-else')) {
+    } else if (this.#elm.hasAttribute('fus-else')) {
       f_proc = this.fus_else();
     }
 
     if (!f_proc) return;
 
-    if (this.has_attr('fus-use')) {
+    if (this.#elm.hasAttribute('fus-use')) {
       return this.fus_use(this.attr('fus-use'), 'fus-arg:');
     }
 
-    if (this.has_attr('fus-v')) {
-      this.#elm.textContent = String(this.getval(this.attr('fus-v')) ?? '');
+    if (this.#elm.hasAttribute('fus-v')) {
+      this.#elm.textContent = String(
+        this.#env.data.get_scalar(this.attr('fus-v')) ?? ''
+      );
     } else {
       this.process_child();
     }
@@ -316,7 +303,7 @@ class FusElement {
 
   tag_fus_out(): void {
     const text_node = document.createTextNode(
-      String(this.getval(this.attr('v')) ?? '') // Handle null
+      String(this.#env.data.get_scalar(this.attr('v')) ?? '') // Handle null
     );
     this.#elm.after(text_node);
     this.#elm.remove();
@@ -337,14 +324,14 @@ class FusElement {
   _tag_fus_if_opts(): FusIfOptions {
     return {
       v_name: this.attr('v'),
-      is_null: this.has_attr('is-null'),
-      has_eq: this.has_attr('eq'),
-      eq: this.attr_or_null('eq'),
+      is_null: this.#elm.hasAttribute('is-null'),
+      has_eq: this.#elm.hasAttribute('eq'),
+      eq: this.#elm.getAttribute('eq'),
       gt: Number(this._get_attr_val_or_var('gt')),
       ge: Number(this._get_attr_val_or_var('ge')),
       lt: Number(this._get_attr_val_or_var('lt')),
       le: Number(this._get_attr_val_or_var('le')),
-      not: this.has_attr('not'),
+      not: this.#elm.hasAttribute('not'),
     };
   }
 
@@ -356,7 +343,7 @@ class FusElement {
       i_name: this.attr('iname'),
       i_start: Number(this.attr('i-start', '0')),
       i_step: Number(this.attr('i-step', '1')),
-      to_top: this.has_attr('to-top'),
+      to_top: this.#elm.hasAttribute('to-top'),
     });
   }
 
@@ -393,7 +380,7 @@ class FusElement {
   }
 
   fus_if(opt: FusIfOptions): boolean {
-    const val = this.getval(opt.v_name);
+    const val = this.#env.data.get_scalar(opt.v_name);
     let f = null;
     if (opt.is_null) {
       f = val === null;
@@ -430,13 +417,13 @@ class FusElement {
   fus_with() {
     const new_env = this.#env.copy();
     for (const alias in this.#elm.attributes) {
-      new_env.data.add(alias, this.getenv(this.attr(alias)));
+      new_env.data.add(alias, this.#env.data.get_enval(this.attr(alias)));
     }
     this.process_child(new_env);
   }
 
   fus_for(opt: FusForOptions) {
-    const iter_val = this.getenv(opt.iter_name);
+    const iter_val = this.#env.data.get_enval(opt.iter_name);
     if (!(iter_val instanceof EnvABC))
       throw new Error('Value is not iterable.');
     let i0 = 0;
@@ -472,7 +459,7 @@ class FusElement {
 
   fus_switch(v_name: string) {
     const new_env = this.#env.copy();
-    const _var = this.getenv(v_name);
+    const _var = this.#env.data.get_enval(v_name);
     if (_var === null) throw new Error('Switch variable cannot be null.');
     new_env.sys.switch_target = _var;
   }
@@ -540,8 +527,9 @@ class FusElement {
   }
 
   _get_attr_val_or_var(name: string): EnvValue {
-    if (this.has_attr(name + '-v')) return this.getval(this.attr(name));
-    return this.attr_or_null(name);
+    if (this.#elm.hasAttribute(name + '-v'))
+      return this.#env.data.get_scalar(this.attr(name));
+    return this.#elm.getAttribute(name);
   }
 }
 
@@ -567,7 +555,7 @@ interface FusIfOptions {
   not: boolean;
 }
 
-//   f_proc_c &&= val == this.getval(elm_val);
+//   f_proc_c &&= val == this.#env.data.get_scalar(elm_val);
 // } else if ((elm_val = elm.getAttribute('more-than'))) {
 //   f_proc_c &&= Number(val) > Number(env.data.get_scalar(elm_val));
 // } else if ((elm_val = elm.getAttribute('more-than-eq'))) {
