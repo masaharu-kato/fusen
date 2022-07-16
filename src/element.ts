@@ -67,6 +67,7 @@ class FusNodeList extends FusNode {
     else {
       let next_cnode_i = 0; //  Counter for elm_cnodes
       for (const node of this.nodes) {
+        if (next_cnode_i >= elm_cnodes.length) throw new Error('Base element child nodes out of range.');
         if (node instanceof FusNode) {
           if (node instanceof SingleFusNode) {
             //  Update existing base node
@@ -79,7 +80,6 @@ class FusNodeList extends FusNode {
         } else {
           next_cnode_i++;
         }
-        if (next_cnode_i >= elm_cnodes.length) throw new Error('Base element child nodes out of range.');
       }
     }
   }
@@ -195,7 +195,10 @@ export function process_nodes(nodes: Array<ChildNode>): FusNodeList {
         const tmpl = new TemplateText(text);
         if (tmpl.has_codes()) {
           result.push(new TemplateTextNode(tmpl));
+          node.after(document.createTextNode(''));
           node.remove();
+        } else {
+          result.push(node);
         }
       }
     }
