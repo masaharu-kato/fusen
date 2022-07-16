@@ -52,17 +52,3 @@ test.each([
     expect(Object.entries(fus_node.tmpl_attrs).map(([k, v]) => [k, v.pos_codes[0]])).toEqual(Object.entries(info.tmpl_attrs));
   }
 });
-
-
-const data = {name: 'hoge', baz:'foo1234', 'view-count': 123, p:{x: 30.5, y: -67.62, z: 9.2452}, color:{rgb:{r:18, g:152, b:8}, hsv:{h:210, s:79, v:34}}};
-
-// test.each([
-//   [1, '<div></div>', '<div></div>'],
-//   [2, '<div>{{name}}</div>', '<div>hoge</div>'],
-// ])('test case %d', (no, tmpl_html, result) => {
-//   document.body.innerHTML = tmpl_html;
-//   const fus_nodes = [...make_fus_nodes([...document.body.childNodes])]
-//   const fus_node = fus_nodes[0];
-//   if(!(fus_node instanceof FusElement)) throw new TypeError();
-//   expect(fus_node.base_elm.tagName.toLowerCase()).toEqual(tag);
-// });
