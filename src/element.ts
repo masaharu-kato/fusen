@@ -10,20 +10,13 @@ export abstract class FusNode {
 export abstract class FusFlowNode extends FusNode {}
 
 abstract class SingleFusNode extends FusNode {
-  base_node: Node;
-
-  constructor(base_node: Node) {
-    super();
-    this.base_node = base_node;
-  }
-
   abstract make_node(evl: Evaluator): Node;
-
-  abstract make_node_with_base(node: Node, evl: Evaluator): void;
 
   *make_nodes(evl: Evaluator): Generator<Node> {
     yield this.make_node(evl);
   }
+
+  abstract fus_required(): boolean;
 }
 
 export function* make_nodes(node: NodeType | null, evl: Evaluator): Generator<Node> {
@@ -44,46 +37,6 @@ class FusNodeList extends FusNode {
     this.nodes = nodes;
   }
 
-  // *get_base_nodes(): Generator<Node> {
-  //   for (const node of this.nodes) {
-  //     if (node instanceof FusNode) {
-  //       if (node instanceof SingleFusNode) yield node.base_node;
-  //     } else {
-  //       yield node;
-  //     }
-  //   }
-  // }
-
-  make_nodes_with_base(elm: Element, evl: Evaluator) {
-    const elm_cnodes = [...elm.childNodes];
-
-    //  No existing base nodes
-    if (!elm_cnodes.length) {
-      for (const node of this.nodes) {
-        if (node instanceof FusNode) elm.append(...node.make_nodes(evl));
-      }
-    }
-    //  Base nodes exists
-    else {
-      let next_cnode_i = 0; //  Counter for elm_cnodes
-      for (const node of this.nodes) {
-        if (next_cnode_i >= elm_cnodes.length) throw new Error('Base element child nodes out of range.');
-        if (node instanceof FusNode) {
-          if (node instanceof SingleFusNode) {
-            //  Update existing base node
-            node.make_node_with_base(elm_cnodes[next_cnode_i], evl);
-            next_cnode_i++;
-          } else {
-            //  Process and add new nodes before the next base node
-            elm_cnodes[next_cnode_i].before(...node.make_nodes(evl));
-          }
-        } else {
-          next_cnode_i++;
-        }
-      }
-    }
-  }
-
   *make_nodes(evl: Evaluator): Generator<Node> {
     for (const node of this.nodes) yield* make_nodes(node, evl);
   }
@@ -94,25 +47,27 @@ export type ChildNodeType = FusNodeList | Node | null;
 class TemplateTextNode extends SingleFusNode {
   tmpl_text: TemplateText;
   constructor(tmpl_text: TemplateText) {
-    super(document.createTextNode(''));
+    super();
     this.tmpl_text = tmpl_text;
-  }
-
-  make_node_with_base(elm: Node, evl: Evaluator): void {
-    elm.textContent = this.tmpl_text.make_text(evl);
   }
 
   make_node(evl: Evaluator): Node {
     return document.createTextNode(this.tmpl_text.make_text(evl));
   }
+
+  fus_required(): boolean {
+    return this.tmpl_text.has_codes();
+  }
 }
 
 export class FusElement extends SingleFusNode {
+  base_elm: Element;
   tmpl_attrs: { [name: string]: TemplateText };
-  child: ChildNodeType;
+  child: FusNodeList | null;
 
   constructor(elm: Element) {
-    super(elm);
+    super();
+    this.base_elm = document.createElement(elm.tagName);
 
     //  Process attributes
     this.tmpl_attrs = {};
@@ -121,32 +76,36 @@ export class FusElement extends SingleFusNode {
       //  If the attribute value contains codes, add to template list and remove original attribute
       if (tmpl.has_codes()) {
         this.tmpl_attrs[attr.name] = tmpl;
-        elm.removeAttribute(attr.name);
+      } else {
+        this.base_elm.setAttribute(attr.name, attr.value);
       }
     }
 
     //  Process child nodes
     this.child = process_nodes([...elm.childNodes]);
-  }
-
-  make_node_with_base(node: Node, evl: Evaluator): void {
-    if (!(node instanceof Element)) throw new TypeError('Invalid type of base node.');
-    const elm = node;
-    for (const [name, tmpl] of Object.entries(this.tmpl_attrs)) {
-      elm.setAttribute(name, tmpl.make_text(evl));
-    }
-    if (this.child instanceof FusNodeList) this.child.make_nodes_with_base(elm, evl);
+    //  If the result is null, child nodes consists of only pure nodes,
+    //  so append them to the base element.
+    if (this.child === null) this.base_elm.append(...[...elm.childNodes].map((node) => node.cloneNode(true)));
   }
 
   make_node(evl: Evaluator): Node {
-    const node = this.base_node.cloneNode(true);
-    this.make_node_with_base(node, evl);
-    return node;
+    //  Clone from the base element (which may contains child nodes)
+    const elm = <Element>this.base_elm.cloneNode(true);
+    for (const [name, v] of Object.entries(this.tmpl_attrs)) {
+      elm.setAttribute(name, v.make_text(evl));
+    }
+    if (this.child !== null) elm.append(...this.child.make_nodes(evl));
+    return elm;
+  }
+
+  fus_required(): boolean {
+    return Object.keys(this.tmpl_attrs).length !== 0 || this.child !== null;
   }
 }
 
-export function process_nodes(nodes: Array<ChildNode>): FusNodeList {
+export function process_nodes(nodes: Array<Node>): FusNodeList | null {
   const result: Array<NodeType> = [];
+  let fus_required = false;
 
   //  Process nodes
   for (const node of nodes) {
@@ -163,7 +122,6 @@ export function process_nodes(nodes: Array<ChildNode>): FusNodeList {
         const new_fus_node = process_fus_tag_element(tag, attrs, child, last_fus_node);
         if (new_fus_node !== null) result.push(new_fus_node);
         last_fus_node = new_fus_node;
-        elm.remove();
       }
       //  Normal element which may have Fus attributes
       else {
@@ -185,25 +143,29 @@ export function process_nodes(nodes: Array<ChildNode>): FusNodeList {
         // } else {
         //   result.push(new FusElement(elm));
         // }
-        result.push(new FusElement(elm));
+        const fus_elm = new FusElement(elm);
+        if (fus_elm.fus_required()) {
+          fus_required = true;
+          result.push(fus_elm);
+        } else {
+          result.push(elm.cloneNode(true));
+        }
       }
 
       //  Text Node
     } else {
       const text = node.textContent;
-      if (text !== null) {
-        const tmpl = new TemplateText(text);
-        if (tmpl.has_codes()) {
-          result.push(new TemplateTextNode(tmpl));
-          node.after(document.createTextNode(''));
-          node.remove();
-        } else {
-          result.push(node);
-        }
+      let tmpl;
+      if (text !== null && (tmpl = new TemplateText(text)).has_codes()) {
+        result.push(new TemplateTextNode(tmpl));
+        fus_required = true;
+      } else {
+        result.push(node.cloneNode(true));
       }
     }
   }
-  return new FusNodeList(result);
+  if (fus_required) return new FusNodeList(result);
+  return null;
 }
 
 class FusIf extends FusFlowNode {
